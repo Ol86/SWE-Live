@@ -1,0 +1,11 @@
+name: Analyze code
+
+on:
+  push:
+    branches: [development, main]
+  pull_request:
+    branches: [development, main]
+
+jobs:
+  analyze:
+    runs-on: ubuntu-latest
