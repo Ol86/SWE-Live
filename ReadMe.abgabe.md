@@ -16,6 +16,7 @@ Gemini 3.1 Pro
 ### Chat-URLs, z.B. https://chatgpt.com
 
 ## Frameworks und Bibliotheken
+[Gin](https://gin-gonic.com/)
 
 ### REST-Schnittstelle (Lesen und Neuanlegen)
 
