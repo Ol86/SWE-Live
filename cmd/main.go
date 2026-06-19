@@ -1,8 +1,13 @@
 package main
 
-import "github.com/gin-gonic/gin"
+import (
+	"SWE-Live/pkg/logger"
+
+	"github.com/gin-gonic/gin"
+)
 
 func main() {
+	logger.InitLogger("develoment")
 	router := gin.Default()
 	router.GET("/ping", func(ctx *gin.Context) {
 		ctx.JSON(200, gin.H{
