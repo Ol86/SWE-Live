@@ -4,7 +4,7 @@ import (
 	"context"
 	"errors"
 
-	"library/internal/db/sqlc"
+	"SWE-Live/internal/db/sqlc"
 
 	"github.com/jackc/pgx/v5"
 	"github.com/jackc/pgx/v5/pgtype"
