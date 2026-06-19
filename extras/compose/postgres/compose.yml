@@ -1,0 +1,55 @@
+# Copyright (C) 2023 - present Juergen Zimmermann, Hochschule Karlsruhe
+#
+# Local PostgreSQL setup for the Go/Gin library microservice prototype.
+#
+# Start:
+#   docker compose -f extras/compose/postgres/compose.yml up -d
+#
+# Connection URL:
+#   postgres://library:p@localhost:5432/library?sslmode=disable
+
+services:
+  db:
+    image: dhi.io/postgres:18.3-debian13
+    ports:
+      - published: 5432
+        target: 5432
+    volumes:
+      - pg_data:/var/lib/postgresql/18/data
+      - ./init:/init:ro
+      - ./init/00-init-library.sh:/docker-entrypoint-initdb.d/00-init-library.sh:ro
+    environment:
+      TZ: Europe/Berlin
+      POSTGRES_PASSWORD_FILE: /run/secrets/db_password
+      POSTGRES_HOST_AUTH_METHOD: scram-sha-256
+      POSTGRES_INITDB_ARGS: "--auth-local=scram-sha-256 --auth-host=scram-sha-256"
+    secrets: [db_password]
+    networks: [swe-live-network]
+    hostname: postgres
+    container_name: swe-live-postgres
+    healthcheck:
+      test: [CMD, pg_isready, --dbname=library, --username=library]
+      interval: 5s
+      timeout: 2s
+      retries: 10
+      start_period: 10s
+    restart: unless-stopped
+    deploy:
+      resources:
+        limits:
+          cpus: "0.5"
+          memory: 768M
+        reservations:
+          cpus: "0.5"
+          memory: 512M
+
+secrets:
+  db_password:
+    file: ./password.txt
+
+volumes:
+  pg_data:
+
+networks:
+  swe-live-network:
+    name: swe-live-network
