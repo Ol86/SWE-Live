@@ -1,0 +1,29 @@
+meta {
+  name: 03 Search Members By Query
+  type: http
+  seq: 3
+}
+
+get {
+  url: {{baseUrl}}/rest/members
+  body: none
+  auth: none
+}
+
+params:query {
+  username: paul
+  emailAddress: 
+  lastName: 
+  limit: 20
+  offset: 0
+}
+
+tests {
+  test("returns HTTP 200", function() {
+    expect(res.status).to.equal(200);
+  });
+
+  test("returns a JSON array", function() {
+    expect(res.body).to.be.an("array");
+  });
+}
