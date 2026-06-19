@@ -20,12 +20,12 @@ const (
 )
 
 var (
-	ErrInvalidMemberInput   = errors.New("invalid member input")
-	ErrInvalidEmail         = errors.New("invalid email address")
-	ErrInvalidUsername      = errors.New("invalid username")
-	ErrInvalidDateOfBirth   = errors.New("invalid date of birth")
-	ErrInvalidInterests     = errors.New("invalid interests JSON")
-	ErrInvalidMemberQuery   = errors.New("invalid member query")
+	ErrInvalidMemberInput = errors.New("invalid member input")
+	ErrInvalidEmail       = errors.New("invalid email address")
+	ErrInvalidUsername    = errors.New("invalid username")
+	ErrInvalidDateOfBirth = errors.New("invalid date of birth")
+	ErrInvalidInterests   = errors.New("invalid interests JSON")
+	ErrInvalidMemberQuery = errors.New("invalid member query")
 )
 
 // Email regex pattern for basic validation
