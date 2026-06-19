@@ -53,6 +53,12 @@ func main() {
 		Handler: router,
 	}
 
+	if config.TLSEnabled {
+		if err := server.ListenAndServeTLS(config.TLSCertPath, config.TLSKeyPath); err != nil && err != http.ErrServerClosed {
+			appLogger.Error("Server-TLS-Error: %v", err)
+		}
+	}
+
 	if err := server.ListenAndServe(); err != nil && err != http.ErrServerClosed {
 		appLogger.Error("Server-Error: %v", err)
 	}

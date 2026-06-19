@@ -1,4 +1,7 @@
 # Environment files
 **/*.env
 
-# Environments
+# TLS
+**/*.crt
+**/*.key
+**/*.pem
