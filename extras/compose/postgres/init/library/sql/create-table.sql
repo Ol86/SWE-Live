@@ -1,6 +1,4 @@
 
-SET default_tablespace = libraryspace;
-
 CREATE SCHEMA IF NOT EXISTS AUTHORIZATION library;
 
 ALTER ROLE library SET search_path = 'library';

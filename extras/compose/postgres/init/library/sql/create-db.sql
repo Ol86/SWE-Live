@@ -27,5 +27,3 @@ CREATE DATABASE library;
 -- https://www.postgresql.org/docs/current/sql-grant.html
 GRANT ALL ON DATABASE library TO library;
 
--- https://www.postgresql.org/docs/current/sql-createtablespace.html
-CREATE TABLESPACE libraryspace OWNER library LOCATION '/tablespace/library';
