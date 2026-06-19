@@ -1,4 +1,4 @@
-module library
+module SWE-Live
 
 go 1.26.4
 
