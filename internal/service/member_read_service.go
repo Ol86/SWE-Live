@@ -3,23 +3,9 @@ package service
 import (
 	"context"
 	"encoding/json"
-	"errors"
-	"strings"
-	"time"
 
-	"SWE-Live/internal/db/sqlc"
 	"SWE-Live/internal/repository"
-
-	"github.com/jackc/pgx/v5/pgtype"
 )
-
-const (
-	defaultMemberReadLimit int32 = 20
-	maxMemberReadLimit     int32 = 100
-	dateLayout                   = "2006-01-02"
-)
-
-var ErrInvalidMemberQuery = errors.New("invalid member query")
 
 type MemberReadService interface {
 	GetByID(ctx context.Context, id int32) (MemberReadModel, error)
@@ -82,96 +68,4 @@ func (s *DefaultMemberReadService) GetByQueryParam(ctx context.Context, query Me
 		result = append(result, mapMemberReadModel(member))
 	}
 	return result, nil
-}
-
-func normalizeMemberQuery(query MemberQuery) (repository.MemberFilter, error) {
-	if query.Limit < 0 || query.Offset < 0 || query.Limit > maxMemberReadLimit {
-		return repository.MemberFilter{}, ErrInvalidMemberQuery
-	}
-
-	limit := query.Limit
-	if limit == 0 {
-		limit = defaultMemberReadLimit
-	}
-
-	return repository.MemberFilter{
-		Username:     normalizeStringFilter(query.Username),
-		EmailAddress: normalizeStringFilter(query.EmailAddress),
-		LastName:     normalizeStringFilter(query.LastName),
-		Limit:        limit,
-		Offset:       query.Offset,
-	}, nil
-}
-
-func normalizeStringFilter(value *string) *string {
-	if value == nil {
-		return nil
-	}
-	normalized := strings.TrimSpace(*value)
-	if normalized == "" {
-		return nil
-	}
-	return &normalized
-}
-
-func mapMemberReadModel(member repository.Member) MemberReadModel {
-	return MemberReadModel{
-		ID:           member.ID,
-		Version:      member.Version,
-		Username:     member.Username,
-		FirstName:    member.FirstName,
-		LastName:     member.LastName,
-		Gender:       mapGender(member.Gender),
-		DateOfBirth:  formatDate(member.DateOfBirth),
-		MemberSince:  formatOptionalDate(member.MemberSince),
-		IsStudent:    mapOptionalBool(member.IsStudent),
-		EmailAddress: member.EmailAddress,
-		Interests:    mapRawJSON(member.Interests),
-		Generated:    formatTimestamp(member.Generated),
-		Updated:      formatTimestamp(member.Updated),
-	}
-}
-
-func mapGender(gender sqlc.NullLibraryGender) *string {
-	if !gender.Valid {
-		return nil
-	}
-	value := string(gender.LibraryGender)
-	return &value
-}
-
-func mapOptionalBool(value pgtype.Bool) *bool {
-	if !value.Valid {
-		return nil
-	}
-	return &value.Bool
-}
-
-func formatDate(value pgtype.Date) string {
-	if !value.Valid {
-		return ""
-	}
-	return value.Time.Format(dateLayout)
-}
-
-func formatOptionalDate(value pgtype.Date) *string {
-	if !value.Valid {
-		return nil
-	}
-	formatted := value.Time.Format(dateLayout)
-	return &formatted
-}
-
-func formatTimestamp(value pgtype.Timestamptz) string {
-	if !value.Valid {
-		return ""
-	}
-	return value.Time.UTC().Format(time.RFC3339)
-}
-
-func mapRawJSON(value []byte) json.RawMessage {
-	if len(value) == 0 || string(value) == "null" {
-		return nil
-	}
-	return json.RawMessage(value)
 }
