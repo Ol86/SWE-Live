@@ -66,3 +66,43 @@ Füge sinnvolles Logging für Debugging dem Service und Handler hinzu."
 "Gibt es eine Library, die sich in Go für Integrationstests eignet?"
 
 "Implementiere entsprechend einen Integrationstest für die Lese-Operationen."
+
+### Gemini
+"Wir wollen einen Microservice in Go mit dem Gin framework ausfetzen, dabei würden wir gerne die folgende Ordnerstruktur nutzen, kannst du mir da einen genuen Plan erstellen, wie man da am besten vorgeht?
+SWE-live/
+│
+├── cmd/
+│   └── main.go
+│
+├── internal/
+│   ├── handlers/
+│   │   └── todo.go
+│   │
+│   ├── routes/
+│   │   └── routes.go
+│   │
+│   ├── services/
+│   │   └── todo_service.go
+│   │
+│   └── config/
+│       └── loader.go
+│
+├── pkg/
+│   ├── config/
+│   │   └── config.go
+│   │
+│   └── logger/
+│       └── logger.go
+│
+├── .env
+└── go.mod"
+
+"Erstelle bitte einmal ersten eine Muster main.go datei, damit ich auch verstehen kann, wie genau die imports und alles funktionieren"
+
+"Okay, das habe ich jetzt soweit verstanden, wie kann ich jetzt aus der .env Datei die Variblen am besten importieren?"
+
+"Wie genau müsste da dann die loader.go datei in dem internal/config folder aussehen?"
+
+"Okay das ist nun soweit geschafft, nun würde ich gerne mit den handlern weitermachen, wie genau muss ich das machen, damit ich mehrere Router nutzen kann?"
+
+"wie genau kann ich hier dann die routes zu der main.go hinzufügen?"
