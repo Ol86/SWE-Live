@@ -8,10 +8,11 @@ Paul Bräuninger
 [Github](https://github.com/Ol86/SWE-Live)
 
 ## KI-Werkzeuge
-Claude
-Gemini 3.1 Pro
 
 ### Agenten
+Claude
+Gemini 3.1 Pro
+Codex 5.5
 
 ### Chat-URLs, z.B. https://chatgpt.com
 
@@ -41,3 +42,27 @@ Nicht verwendet.
 testcontainers-go mit PostgreSQL-Container und pgx-Connection-Pool.
 
 ## Prompts/Requests an KI-Agent/en
+
+# CODEX:
+
+"Für die Datenbank des kleinen Microservice-Prototypens, weches Gin nutzt, soll ein Repository für den Datenbankzugriff implementiert werden.
+Hierfür soll sqlc genutzt werden.
+Der Zugriff soll folgendes beinhalten: Suchen mittels ID, Suchen mittels QueryParam, Neuen Member anlegen, bestehenden Member ändern, einen bestehenden Member löschen (Es muss nur auf die AggregateRoot Member zugegriffen werden).
+Empfehle entsprechend dem bisherigen Projekt Vorgehensweise und Struktur. Implementiere erst, wenn ich das okay gebe."
+
+"Was ist nun der nächste logische Schritt für den Prototypen?"
+
+"Wir möchten den Service aufteilen für einen read_service und write_service. Der Read-Service enthält Lese-Operationen (getByID, getByQueryParam, usw.) Der Write-Service die Operationen post, put und delete.
+Zuerst soll sich um den read_service gekümmert werden. Schlage eine Vorgehensweise und Inhalt für diesen vor. Implementiere jedoch erst, wenn ich einverstanden bin."
+
+"Dann möchte ich jetzt den passenden Gin-Handler implementieren für den Read-Service.
+Das File soll read_handler.go heißen."
+
+"Im Projektverzeichnis existiert ein Logger.
+Füge sinnvolles Logging für Debugging dem Service und Handler hinzu."
+
+"Lege in extras eine Bruno-Collection an, die jede Operation testet."
+
+"Gibt es eine Library, die sich in Go für Integrationstests eignet?"
+
+"Implementiere entsprechend einen Integrationstest für die Lese-Operationen."
