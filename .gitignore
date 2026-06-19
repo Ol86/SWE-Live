@@ -5,3 +5,7 @@
 **/*.crt
 **/*.key
 **/*.pem
+# Environments
+
+.go-build/
+.go-mod/
