@@ -9,6 +9,7 @@ import (
 type Config struct {
 	Port        string
 	Environment string
+	DatabaseUrl string
 }
 
 func Load() (*Config, error) {
