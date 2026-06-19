@@ -38,6 +38,6 @@ func main() {
 	}
 
 	if error := server.ListenAndServe(); error != nil && error != http.ErrServerClosed {
-		//TODO: Logger
+		appLogger.Error("Server-Error: %v", error)
 	}
 }
