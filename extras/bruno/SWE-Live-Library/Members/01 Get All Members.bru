@@ -20,6 +20,11 @@ tests {
     expect(res.status).to.equal(200);
   });
 
+  test("returns a response body", function() {
+    expect(res.body).to.not.equal(undefined);
+    expect(res.body).to.not.equal(null);
+  });
+
   test("returns a JSON array", function() {
     expect(res.body).to.be.an("array");
   });

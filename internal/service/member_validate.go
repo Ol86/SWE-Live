@@ -132,6 +132,14 @@ func normalizeStringFilter(value *string) *string {
 	return &normalized
 }
 
+func hasStringFilter(value *string) bool {
+	return normalizeStringFilter(value) != nil
+}
+
+func isGetAll(filter repository.MemberFilter) bool {
+	return filter.Username == nil && filter.EmailAddress == nil && filter.LastName == nil
+}
+
 // Date parsing helpers
 
 func parseDate(dateStr string) pgtype.Date {

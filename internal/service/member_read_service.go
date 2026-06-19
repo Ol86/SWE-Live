@@ -3,10 +3,7 @@ package service
 import (
 	"context"
 	"encoding/json"
-	"errors"
 	"log/slog"
-	"strings"
-	"time"
 
 	"SWE-Live/internal/repository"
 )

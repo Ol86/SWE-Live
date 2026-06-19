@@ -87,6 +87,9 @@ func (h *MemberReadHandler) GetByQueryParam(ctx *gin.Context) {
 		"status", http.StatusOK,
 		"result_count", len(members),
 	)
+	if members == nil {
+		members = []service.MemberReadModel{}
+	}
 	ctx.JSON(http.StatusOK, members)
 }
 
