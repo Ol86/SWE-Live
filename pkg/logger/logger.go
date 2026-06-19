@@ -5,9 +5,11 @@ import (
 	"os"
 )
 
-var Log *slog.Logger
+type Logger struct {
+	*slog.Logger
+}
 
-func InitLogger(env string) {
+func InitLogger(env string) *Logger {
 	var handler slog.Handler
 
 	if env == "production" {
@@ -16,6 +18,9 @@ func InitLogger(env string) {
 		handler = slog.NewJSONHandler(os.Stdout, &slog.HandlerOptions{Level: slog.LevelDebug})
 	}
 
-	Log = slog.New(handler)
-	slog.SetDefault(Log)
+	baseLogger := slog.New(handler)
+
+	slog.SetDefault(baseLogger)
+
+	return &Logger{Logger: baseLogger}
 }
