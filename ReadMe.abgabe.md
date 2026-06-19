@@ -10,9 +10,9 @@ Paul Bräuninger
 ## KI-Werkzeuge
 
 ### Agenten
-Claude
-Gemini 3.1 Pro
-Codex 5.5
+- Claude
+- Gemini 3.1 Pro
+- Codex 5.5
 
 ### Chat-URLs, z.B. https://chatgpt.com
 
