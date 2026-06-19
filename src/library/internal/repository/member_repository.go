@@ -12,7 +12,7 @@ import (
 
 var (
 	// ErrMemberNotFound is returned when no member exists for the requested lookup.
-	ErrMemberNotFound      = errors.New("member not found")
+	ErrMemberNotFound = errors.New("member not found")
 	// ErrOptimisticLockStale is returned when an update targets an outdated member version.
 	ErrOptimisticLockStale = errors.New("member was changed concurrently")
 )
@@ -29,15 +29,15 @@ type UpdateMemberParams = sqlc.UpdateMemberParams
 // MemberFilter contains optional search criteria and pagination settings for member lookups.
 type MemberFilter struct {
 	// Username filters members by username when set.
-	Username     *string
+	Username *string
 	// EmailAddress filters members by email address when set.
 	EmailAddress *string
 	// LastName filters members by last name when set.
-	LastName     *string
+	LastName *string
 	// Limit caps the number of returned members. Values less than or equal to zero use the default limit.
-	Limit        int32
+	Limit int32
 	// Offset skips the given number of matching members before returning results.
-	Offset       int32
+	Offset int32
 }
 
 // MemberRepository defines persistence operations for library members.
