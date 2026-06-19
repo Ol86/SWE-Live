@@ -2,3 +2,6 @@
 **/*.env
 
 # Environments
+
+.go-build/
+.go-mod/
