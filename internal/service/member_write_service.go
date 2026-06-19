@@ -17,7 +17,7 @@ var (
 // MemberWriteService handles create, update, and delete operations for members.
 type MemberWriteService interface {
 	Create(ctx context.Context, cmd CreateMemberCommand) (MemberWriteModel, error)
-	Update(ctx context.Context, cmd UpdateMemberCommand) (MemberWriteModel, error)
+	Update(ctx context.Context, cmd UpdateMemberCommand, id int32) (MemberWriteModel, error)
 	Delete(ctx context.Context, id int32) error
 }
 
@@ -46,7 +46,6 @@ type CreateMemberCommand struct {
 
 // UpdateMemberCommand contains the values needed to update an existing member.
 type UpdateMemberCommand struct {
-	ID           int32   `json:"id"`
 	Version      int32   `json:"version"`
 	Username     string  `json:"username"`
 	FirstName    string  `json:"firstName"`
@@ -103,13 +102,13 @@ func (s *DefaultMemberWriteService) Create(ctx context.Context, cmd CreateMember
 }
 
 // Update modifies an existing member and returns the updated record.
-func (s *DefaultMemberWriteService) Update(ctx context.Context, cmd UpdateMemberCommand) (MemberWriteModel, error) {
-	if err := validateUpdateMemberCommand(cmd); err != nil {
+func (s *DefaultMemberWriteService) Update(ctx context.Context, cmd UpdateMemberCommand, id int32) (MemberWriteModel, error) {
+	if err := validateUpdateMemberCommand(cmd, id); err != nil {
 		return MemberWriteModel{}, err
 	}
 
 	params := repository.UpdateMemberParams{
-		ID:           cmd.ID,
+		ID:           id,
 		Version:      cmd.Version,
 		Username:     strings.TrimSpace(cmd.Username),
 		FirstName:    strings.TrimSpace(cmd.FirstName),

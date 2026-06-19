@@ -61,11 +61,11 @@ func validateCreateMemberCommand(cmd CreateMemberCommand) error {
 	return nil
 }
 
-func validateUpdateMemberCommand(cmd UpdateMemberCommand) error {
-	if cmd.ID <= 0 {
+func validateUpdateMemberCommand(cmd UpdateMemberCommand, id int32) error {
+	if id <= 0 {
 		return ErrInvalidMemberInput
 	}
-	if cmd.Version <= 0 {
+	if cmd.Version < 0 {
 		return ErrInvalidMemberInput
 	}
 	return validateCreateMemberCommand(CreateMemberCommand{

@@ -25,8 +25,8 @@ func NewMemberWriteHandler(svc service.MemberWriteService) *MemberWriteHandler {
 func (h *MemberWriteHandler) RegisterRoutes(router gin.IRoutes) {
 	slog.Debug("Registering member write routes")
 	router.POST("/members", h.CreateMember)
-	router.PUT("/members", h.UpdateMember)
-	router.DELETE("/members", h.DeleteMember)
+	router.PUT("/members/:id", h.UpdateMember)
+	router.DELETE("/members/:id", h.DeleteMember)
 }
 
 // CreateMember handles POST /members to create a new member.
@@ -60,7 +60,17 @@ func (h *MemberWriteHandler) CreateMember(ctx *gin.Context) {
 func (h *MemberWriteHandler) UpdateMember(ctx *gin.Context) {
 	slog.DebugContext(ctx.Request.Context(), "Handling update member request",
 		"path", ctx.FullPath(),
+		"raw_member_id", ctx.Param("id"),
 	)
+
+	id, ok := parseInt32PathParam(ctx, "id")
+	if !ok {
+		slog.DebugContext(ctx.Request.Context(), "Rejected update member request because id is invalid",
+			"raw_member_id", ctx.Param("id"),
+		)
+		writeError(ctx, http.StatusBadRequest, "invalid member id")
+		return
+	}
 
 	var cmd service.UpdateMemberCommand
 	if err := ctx.ShouldBindJSON(&cmd); err != nil {
@@ -71,7 +81,7 @@ func (h *MemberWriteHandler) UpdateMember(ctx *gin.Context) {
 		return
 	}
 
-	member, err := h.service.Update(ctx.Request.Context(), cmd)
+	member, err := h.service.Update(ctx.Request.Context(), cmd, id)
 	if err != nil {
 		h.writeServiceError(ctx, err, "update member")
 		return
@@ -87,13 +97,13 @@ func (h *MemberWriteHandler) UpdateMember(ctx *gin.Context) {
 func (h *MemberWriteHandler) DeleteMember(ctx *gin.Context) {
 	slog.DebugContext(ctx.Request.Context(), "Handling delete member request",
 		"path", ctx.FullPath(),
-		"raw_member_id", ctx.Query("id"),
+		"raw_member_id", ctx.Param("id"),
 	)
 
-	id, ok := parseInt32QueryParam(ctx, "id")
+	id, ok := parseInt32PathParam(ctx, "id")
 	if !ok {
 		slog.DebugContext(ctx.Request.Context(), "Rejected delete member request because id is invalid",
-			"raw_member_id", ctx.Query("id"),
+			"raw_member_id", ctx.Param("id"),
 		)
 		writeError(ctx, http.StatusBadRequest, "invalid member id")
 		return
