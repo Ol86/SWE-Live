@@ -1,0 +1,48 @@
+meta {
+  name: 04 Create Member
+  type: http
+  seq: 4
+}
+
+post {
+  url: {{baseUrl}}/rest/members
+  body: json
+  auth: none
+}
+
+headers {
+  Content-Type: application/json
+}
+
+body:json {
+  {
+    "username": "bruno-user",
+    "firstName": "Bruno",
+    "lastName": "Tester",
+    "gender": "DIVERSE",
+    "dateOfBirth": "1995-06-19",
+    "memberSince": "2026-06-19",
+    "isStudent": false,
+    "emailAddress": "bruno.user@example.com"
+  }
+}
+
+script:post-response {
+  if (res.body && res.body.id) {
+    bru.setEnvVar("createdMemberId", String(res.body.id));
+  }
+  if (res.body && res.body.version !== undefined) {
+    bru.setEnvVar("createdMemberVersion", String(res.body.version));
+  }
+}
+
+tests {
+  test("returns HTTP 201 Created", function() {
+    expect(res.status).to.equal(201);
+  });
+  
+  test("returns the created member", function() {
+    expect(res.body).to.have.property("id");
+    expect(res.body.username).to.equal("bruno-user");
+  });
+}

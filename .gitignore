@@ -1,4 +1,11 @@
 # Environment files
 **/*.env
 
+# TLS
+**/*.crt
+**/*.key
+**/*.pem
 # Environments
+
+.go-build/
+.go-mod/

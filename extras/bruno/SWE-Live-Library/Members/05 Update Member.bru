@@ -1,0 +1,49 @@
+meta {
+  name: 05 Update Member
+  type: http
+  seq: 5
+}
+
+put {
+  url: {{baseUrl}}/rest/members/{{createdMemberId}}
+  body: json
+  auth: none
+}
+
+headers {
+  Content-Type: application/json
+}
+
+body:json {
+  {
+    "version": {{createdMemberVersion}},
+    "username": "bruno-user",
+    "firstName": "Bruno",
+    "lastName": "Updated",
+    "gender": "DIVERSE",
+    "dateOfBirth": "1995-06-19",
+    "memberSince": "2026-06-19",
+    "isStudent": true,
+    "emailAddress": "bruno.user@example.com"
+  }
+}
+
+vars:pre-request {
+  createdMemberVersion: 0
+}
+
+script:post-response {
+  if (res.body && res.body.version !== undefined) {
+    bru.setEnvVar("createdMemberVersion", String(res.body.version));
+  }
+}
+
+tests {
+  test("returns HTTP 200", function() {
+    expect(res.status).to.equal(200);
+  });
+  
+  test("returns the updated member", function() {
+    expect(res.body.lastName).to.equal("Updated");
+  });
+}
