@@ -19,29 +19,42 @@ const (
 	dateLayout                   = "2006-01-02"
 )
 
+// ErrInvalidMemberQuery is returned when member query pagination values are invalid.
 var ErrInvalidMemberQuery = errors.New("invalid member query")
 
+// MemberReadService provides read-only operations for library members.
 type MemberReadService interface {
+	// GetByID returns a single member by its database ID.
 	GetByID(ctx context.Context, id int32) (MemberReadModel, error)
+	// GetByQueryParam returns members matching the supplied query parameters.
 	GetByQueryParam(ctx context.Context, query MemberQuery) ([]MemberReadModel, error)
 }
 
+// DefaultMemberReadService implements MemberReadService using a member repository.
 type DefaultMemberReadService struct {
 	members repository.MemberRepository
 }
 
+// NewMemberReadService creates a read service backed by the supplied repository.
 func NewMemberReadService(members repository.MemberRepository) *DefaultMemberReadService {
 	return &DefaultMemberReadService{members: members}
 }
 
+// MemberQuery contains optional filter and pagination values for member reads.
 type MemberQuery struct {
-	Username     *string
+	// Username filters members by username. Empty values are treated as unset.
+	Username *string
+	// EmailAddress filters members by email address. Empty values are treated as unset.
 	EmailAddress *string
-	LastName     *string
-	Limit        int32
-	Offset       int32
+	// LastName filters members by last name. Empty values are treated as unset.
+	LastName *string
+	// Limit caps the number of returned members. Zero uses the service default.
+	Limit int32
+	// Offset skips the given number of matching members.
+	Offset int32
 }
 
+// MemberReadModel is the JSON-ready representation returned by read operations.
 type MemberReadModel struct {
 	ID           int32           `json:"id"`
 	Version      int32           `json:"version"`
@@ -58,6 +71,7 @@ type MemberReadModel struct {
 	Updated      string          `json:"updated"`
 }
 
+// GetByID loads a member from the repository and maps it to the read model.
 func (s *DefaultMemberReadService) GetByID(ctx context.Context, id int32) (MemberReadModel, error) {
 	member, err := s.members.FindByID(ctx, id)
 	if err != nil {
@@ -66,6 +80,8 @@ func (s *DefaultMemberReadService) GetByID(ctx context.Context, id int32) (Membe
 	return mapMemberReadModel(member), nil
 }
 
+// GetByQueryParam normalizes query parameters, performs the lookup, and maps the results.
+// If all query parameters are empty, the repository is called without filters, which acts as getAll.
 func (s *DefaultMemberReadService) GetByQueryParam(ctx context.Context, query MemberQuery) ([]MemberReadModel, error) {
 	filter, err := normalizeMemberQuery(query)
 	if err != nil {
@@ -84,6 +100,7 @@ func (s *DefaultMemberReadService) GetByQueryParam(ctx context.Context, query Me
 	return result, nil
 }
 
+// normalizeMemberQuery validates pagination and converts empty string filters into nil filters.
 func normalizeMemberQuery(query MemberQuery) (repository.MemberFilter, error) {
 	if query.Limit < 0 || query.Offset < 0 || query.Limit > maxMemberReadLimit {
 		return repository.MemberFilter{}, ErrInvalidMemberQuery
@@ -103,6 +120,7 @@ func normalizeMemberQuery(query MemberQuery) (repository.MemberFilter, error) {
 	}, nil
 }
 
+// normalizeStringFilter trims a string filter and returns nil for empty values.
 func normalizeStringFilter(value *string) *string {
 	if value == nil {
 		return nil
@@ -114,6 +132,7 @@ func normalizeStringFilter(value *string) *string {
 	return &normalized
 }
 
+// mapMemberReadModel converts a repository member into the service read model.
 func mapMemberReadModel(member repository.Member) MemberReadModel {
 	return MemberReadModel{
 		ID:           member.ID,
@@ -132,6 +151,7 @@ func mapMemberReadModel(member repository.Member) MemberReadModel {
 	}
 }
 
+// mapGender converts a nullable database gender into an optional string.
 func mapGender(gender sqlc.NullLibraryGender) *string {
 	if !gender.Valid {
 		return nil
@@ -140,6 +160,7 @@ func mapGender(gender sqlc.NullLibraryGender) *string {
 	return &value
 }
 
+// mapOptionalBool converts a nullable PostgreSQL boolean into an optional bool.
 func mapOptionalBool(value pgtype.Bool) *bool {
 	if !value.Valid {
 		return nil
@@ -147,6 +168,7 @@ func mapOptionalBool(value pgtype.Bool) *bool {
 	return &value.Bool
 }
 
+// formatDate formats a required PostgreSQL date as an ISO date string.
 func formatDate(value pgtype.Date) string {
 	if !value.Valid {
 		return ""
@@ -154,6 +176,7 @@ func formatDate(value pgtype.Date) string {
 	return value.Time.Format(dateLayout)
 }
 
+// formatOptionalDate formats a nullable PostgreSQL date as an optional ISO date string.
 func formatOptionalDate(value pgtype.Date) *string {
 	if !value.Valid {
 		return nil
@@ -162,6 +185,7 @@ func formatOptionalDate(value pgtype.Date) *string {
 	return &formatted
 }
 
+// formatTimestamp formats a PostgreSQL timestamp as an RFC3339 UTC string.
 func formatTimestamp(value pgtype.Timestamptz) string {
 	if !value.Valid {
 		return ""
@@ -169,6 +193,7 @@ func formatTimestamp(value pgtype.Timestamptz) string {
 	return value.Time.UTC().Format(time.RFC3339)
 }
 
+// mapRawJSON keeps non-empty JSONB values as raw JSON for response encoding.
 func mapRawJSON(value []byte) json.RawMessage {
 	if len(value) == 0 || string(value) == "null" {
 		return nil
