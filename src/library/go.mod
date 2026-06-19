@@ -3,6 +3,10 @@ module library
 go 1.26.4
 
 require (
+	github.com/jackc/pgx/v5 v5.7.6
+)
+
+require (
 	github.com/bytedance/gopkg v0.1.4 // indirect
 	github.com/bytedance/sonic v1.15.2 // indirect
 	github.com/bytedance/sonic/loader v0.5.1 // indirect
