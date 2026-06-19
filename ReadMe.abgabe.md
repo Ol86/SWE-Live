@@ -43,7 +43,7 @@ testcontainers-go mit PostgreSQL-Container und pgx-Connection-Pool.
 
 ## Prompts/Requests an KI-Agent/en
 
-# CODEX:
+### CODEX
 
 "Für die Datenbank des kleinen Microservice-Prototypens, weches Gin nutzt, soll ein Repository für den Datenbankzugriff implementiert werden.
 Hierfür soll sqlc genutzt werden.
