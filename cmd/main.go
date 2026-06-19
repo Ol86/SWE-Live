@@ -42,9 +42,11 @@ func main() {
 
 	memberRepository := repository.NewMemberRepository(dbPool)
 	memberReadService := service.NewMemberReadService(memberRepository)
+	memberWriteService := service.NewMemberWriteService(memberRepository)
 	memberReadHandler := handler.NewMemberReadHandler(memberReadService)
+	memberWriteHandler := handler.NewMemberWriteHandler(memberWriteService)
 
-	routes.SetupRoutes(router, memberReadHandler)
+	routes.SetupRoutes(router, memberReadHandler, memberWriteHandler)
 
 	server := &http.Server{
 		Addr:    config.Port,
