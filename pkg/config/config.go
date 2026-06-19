@@ -9,7 +9,7 @@ import (
 type Config struct {
 	Port        string
 	Environment string
-	DatabaseUrl string
+	DatabaseURL string
 }
 
 func Load() (*Config, error) {
@@ -18,6 +18,7 @@ func Load() (*Config, error) {
 	config := &Config{
 		Port:        getEnv("PORT", ":8080"),
 		Environment: getEnv("ENVIRONMENT", "production"),
+		DatabaseURL: getEnv("DATABASE_URL", "postgres://library:p@localhost:5432/library?sslmode=disable"),
 	}
 
 	return config, nil
