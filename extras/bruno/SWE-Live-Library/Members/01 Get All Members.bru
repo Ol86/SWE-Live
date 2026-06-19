@@ -1,0 +1,26 @@
+meta {
+  name: 01 Get All Members
+  type: http
+  seq: 1
+}
+
+get {
+  url: {{baseUrl}}/rest/members
+  body: none
+  auth: none
+}
+
+params:query {
+  limit: 20
+  offset: 0
+}
+
+tests {
+  test("returns HTTP 200", function() {
+    expect(res.status).to.equal(200);
+  });
+
+  test("returns a JSON array", function() {
+    expect(res.body).to.be.an("array");
+  });
+}
