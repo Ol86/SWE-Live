@@ -15,7 +15,7 @@ var (
 	ErrOptimisticLockStale = errors.New("member was changed concurrently")
 )
 
-type Member = sqlc.Member
+type Member = sqlc.LibraryMember
 type CreateMemberParams = sqlc.CreateMemberParams
 type UpdateMemberParams = sqlc.UpdateMemberParams
 
