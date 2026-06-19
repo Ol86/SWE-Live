@@ -2,6 +2,7 @@ package handler
 
 import (
 	"errors"
+	"log/slog"
 	"net/http"
 	"strconv"
 
@@ -23,51 +24,88 @@ func NewMemberReadHandler(members service.MemberReadService) *MemberReadHandler 
 
 // RegisterRoutes registers the member read routes on the supplied router group.
 func (h *MemberReadHandler) RegisterRoutes(router gin.IRoutes) {
+	slog.Debug("Registering member read routes")
 	router.GET("/members", h.GetByQueryParam)
 	router.GET("/members/:id", h.GetByID)
 }
 
 // GetByID handles GET /members/:id.
 func (h *MemberReadHandler) GetByID(ctx *gin.Context) {
+	slog.DebugContext(ctx.Request.Context(), "Handling get member by id request",
+		"path", ctx.FullPath(),
+		"raw_member_id", ctx.Param("id"),
+	)
+
 	id, ok := parseInt32PathParam(ctx, "id")
 	if !ok {
+		slog.DebugContext(ctx.Request.Context(), "Rejected get member by id request because id is invalid",
+			"raw_member_id", ctx.Param("id"),
+		)
 		writeError(ctx, http.StatusBadRequest, "invalid member id")
 		return
 	}
 
 	member, err := h.members.GetByID(ctx.Request.Context(), id)
 	if err != nil {
-		h.writeServiceError(ctx, err)
+		h.writeServiceError(ctx, err, "get member by id", "member_id", id)
 		return
 	}
 
+	slog.DebugContext(ctx.Request.Context(), "Completed get member by id request",
+		"member_id", id,
+		"status", http.StatusOK,
+	)
 	ctx.JSON(http.StatusOK, member)
 }
 
 // GetByQueryParam handles GET /members and treats an empty query as getAll.
 func (h *MemberReadHandler) GetByQueryParam(ctx *gin.Context) {
+	slog.DebugContext(ctx.Request.Context(), "Handling get members by query request",
+		"path", ctx.FullPath(),
+		"has_query", ctx.Request.URL.RawQuery != "",
+	)
+
 	query, ok := parseMemberQuery(ctx)
 	if !ok {
+		slog.DebugContext(ctx.Request.Context(), "Rejected get members by query request because query is invalid",
+			"has_query", ctx.Request.URL.RawQuery != "",
+		)
 		writeError(ctx, http.StatusBadRequest, "invalid member query")
 		return
 	}
 
 	members, err := h.members.GetByQueryParam(ctx.Request.Context(), query)
 	if err != nil {
-		h.writeServiceError(ctx, err)
+		h.writeServiceError(ctx, err, "get members by query",
+			"limit", query.Limit,
+			"offset", query.Offset,
+		)
 		return
 	}
 
+	slog.DebugContext(ctx.Request.Context(), "Completed get members by query request",
+		"status", http.StatusOK,
+		"result_count", len(members),
+	)
 	ctx.JSON(http.StatusOK, members)
 }
 
-func (h *MemberReadHandler) writeServiceError(ctx *gin.Context, err error) {
+func (h *MemberReadHandler) writeServiceError(ctx *gin.Context, err error, operation string, attrs ...any) {
 	switch {
 	case errors.Is(err, repository.ErrMemberNotFound):
+		slog.DebugContext(ctx.Request.Context(), "Member read request returned not found",
+			append([]any{"operation", operation, "error", err}, attrs...)...,
+		)
 		writeError(ctx, http.StatusNotFound, "member not found")
 	case errors.Is(err, service.ErrInvalidMemberQuery):
+		slog.DebugContext(ctx.Request.Context(), "Member read request returned invalid query",
+			append([]any{"operation", operation, "error", err}, attrs...)...,
+		)
 		writeError(ctx, http.StatusBadRequest, "invalid member query")
 	default:
+		slog.ErrorContext(ctx.Request.Context(), "Member read request failed",
+			append([]any{"operation", operation, "error", err}, attrs...)...,
+		)
 		writeError(ctx, http.StatusInternalServerError, "internal server error")
 	}
 }

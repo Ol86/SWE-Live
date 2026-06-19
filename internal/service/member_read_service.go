@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"errors"
+	"log/slog"
 	"strings"
 	"time"
 
@@ -73,23 +74,48 @@ type MemberReadModel struct {
 
 // GetByID loads a member from the repository and maps it to the read model.
 func (s *DefaultMemberReadService) GetByID(ctx context.Context, id int32) (MemberReadModel, error) {
+	slog.DebugContext(ctx, "Loading member by id", "member_id", id)
+
 	member, err := s.members.FindByID(ctx, id)
 	if err != nil {
+		slog.DebugContext(ctx, "Loading member by id failed", "member_id", id, "error", err)
 		return MemberReadModel{}, err
 	}
+
+	slog.DebugContext(ctx, "Loaded member by id", "member_id", id, "version", member.Version)
 	return mapMemberReadModel(member), nil
 }
 
 // GetByQueryParam normalizes query parameters, performs the lookup, and maps the results.
 // If all query parameters are empty, the repository is called without filters, which acts as getAll.
 func (s *DefaultMemberReadService) GetByQueryParam(ctx context.Context, query MemberQuery) ([]MemberReadModel, error) {
+	slog.DebugContext(ctx, "Loading members by query parameters",
+		"has_username_filter", hasStringFilter(query.Username),
+		"has_email_filter", hasStringFilter(query.EmailAddress),
+		"has_last_name_filter", hasStringFilter(query.LastName),
+		"limit", query.Limit,
+		"offset", query.Offset,
+	)
+
 	filter, err := normalizeMemberQuery(query)
 	if err != nil {
+		slog.DebugContext(ctx, "Member query validation failed",
+			"limit", query.Limit,
+			"offset", query.Offset,
+			"error", err,
+		)
 		return nil, err
 	}
 
+	slog.DebugContext(ctx, "Normalized member query",
+		"is_get_all", isGetAll(filter),
+		"limit", filter.Limit,
+		"offset", filter.Offset,
+	)
+
 	members, err := s.members.Find(ctx, filter)
 	if err != nil {
+		slog.DebugContext(ctx, "Loading members by query parameters failed", "error", err)
 		return nil, err
 	}
 
@@ -97,6 +123,8 @@ func (s *DefaultMemberReadService) GetByQueryParam(ctx context.Context, query Me
 	for _, member := range members {
 		result = append(result, mapMemberReadModel(member))
 	}
+
+	slog.DebugContext(ctx, "Loaded members by query parameters", "result_count", len(result))
 	return result, nil
 }
 
@@ -130,6 +158,14 @@ func normalizeStringFilter(value *string) *string {
 		return nil
 	}
 	return &normalized
+}
+
+func hasStringFilter(value *string) bool {
+	return normalizeStringFilter(value) != nil
+}
+
+func isGetAll(filter repository.MemberFilter) bool {
+	return filter.Username == nil && filter.EmailAddress == nil && filter.LastName == nil
 }
 
 // mapMemberReadModel converts a repository member into the service read model.
